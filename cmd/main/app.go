@@ -1,26 +1,28 @@
 package main
 
 import (
-	"log"
 	"net"
 	"net/http"
 	"restapi-lesson/internal/user"
+	"restapi-lesson/pkg/logging"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
-	log.Println("create roter")
+	logger := logging.GetLogger()
+	logger.Info("create roter")
 	router := httprouter.New()
-	log.Println("register user handler")
-	handler := user.NewHandler()
+	logger.Info("register user handler")
+	handler := user.NewHandler(logger)
 	handler.Register(router)
 	start(router)
 }
 
 func start(router *httprouter.Router) {
-	log.Println("start application")
+	logger := logging.GetLogger()
+	logger.Info("start application")
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		panic(err)
@@ -32,6 +34,6 @@ func start(router *httprouter.Router) {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("server is listening port 0.0.0.0:8080")
-	log.Fatalln(server.Serve(listener))
+	logger.Info("server is listening port 0.0.0.0:8080")
+	logger.Fatal(server.Serve(listener))
 }
