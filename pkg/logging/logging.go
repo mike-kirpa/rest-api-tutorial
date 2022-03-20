@@ -36,8 +36,8 @@ type Logger struct {
 	*logrus.Entry
 }
 
-func GetLogger() Logger {
-	return Logger{Entry: e}
+func GetLogger() *Logger {
+	return &Logger{Entry: e}
 }
 
 func (l *Logger) GetLoggerWithField(k string, v interface{}) Logger {
