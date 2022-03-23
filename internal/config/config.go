@@ -14,6 +14,15 @@ type Config struct {
 		BindIP string `yaml:"bind_ip"`
 		Port   string `yaml:"port"`
 	} `yaml:"listen"`
+	MongoDB struct {
+		Host       string `json:"host"`
+		Port       string `json:"port"`
+		Collection string `json:"collection"`
+		Database   string `json:"database"`
+		AuthDB     string `json:"auth_db"`
+		Username   string `json:"username"`
+		Password   string `json:"password"`
+	} `json:"mongodb"`
 }
 
 var instance *Config

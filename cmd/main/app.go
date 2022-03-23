@@ -21,7 +21,52 @@ func main() {
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
+	/*
+		cfgMongo := cfg.MongoDB
+		mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfg.MongoDB.Port, cfg.MongoDB.Username,
+			cfg.MongoDB.Password, cfg.MongoDB.Database, cfg.MongoDB.AuthDB)
+		if err != nil {
+			panic(err)
+		}
+		storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
 
+		user1 := user.User{
+			ID:           "",
+			Email:        "some3@email.com",
+			Username:     "some3user",
+			PasswordHash: "54321",
+		}
+		user1ID, err := storage.Create(context.Background(), user1)
+		if err != nil {
+			panic(err)
+		}
+		logger.Info(user1ID)
+
+		user1Found, err := storage.FindOne(context.Background(), user1ID)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(user1Found)
+
+		user1Found.Email = "newEmail@some.ok"
+		err = storage.Update(context.Background(), user1Found)
+		if err != nil {
+			panic(err)
+		}
+
+		users, err := storage.FindAll(context.Background())
+		fmt.Println(users)
+
+			err = storage.Delete(context.Background(), user1ID)
+			if err != nil {
+				panic(err)
+			}
+
+			_, err = storage.FindOne(context.Background(), user1ID)
+			if err != nil {
+				panic(err)
+			}
+	*/
 	logger.Info("register user handler")
 	handler := user.NewHandler(logger)
 	handler.Register(router)
