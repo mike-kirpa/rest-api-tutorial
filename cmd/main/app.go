@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+
+	author2 "restapi-lesson/internal/author"
+	author "restapi-lesson/internal/author/db"
 	"restapi-lesson/internal/config"
-	"restapi-lesson/internal/user"
+	"restapi-lesson/pkg/client/postgresql"
 	"restapi-lesson/pkg/logging"
 	"time"
 
@@ -21,6 +25,42 @@ func main() {
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
+
+	postgreSQLClient, err := postgresql.NewClient(context.TODO(), 3, cfg.Storage)
+
+	if err != nil {
+		logger.Fatal("%v", err)
+	}
+
+	repository := author.NewRepository(postgreSQLClient, logger)
+	/*
+		newAth := author2.Author{
+			Name: "MIR",
+		}
+
+		err = repository.Create(context.TODO(), &newAth)
+		if err != nil {
+			logger.Fatal("%v", err)
+		}
+
+		logger.Infof("%v", newAth)
+
+		one, err := repository.FindOne(context.TODO(), "374e088d-ea28-404c-a383-c9f231f629d1")
+		if err != nil {
+			return
+		}
+		logger.Info(one)
+
+		all, err := repository.FindAll(context.TODO())
+		if err != nil {
+			logger.Fatal("%v", err)
+		}
+
+		for _, ath := range all {
+			logger.Infof("%v", ath)
+		}
+	*/
+
 	/*
 		cfgMongo := cfg.MongoDB
 		mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfg.MongoDB.Port, cfg.MongoDB.Username,
@@ -67,9 +107,11 @@ func main() {
 				panic(err)
 			}
 	*/
-	logger.Info("register user handler")
-	handler := user.NewHandler(logger)
+
+	logger.Info("register author handler")
+	handler := author2.NewHandler(repository, logger)
 	handler.Register(router)
+
 	start(router, cfg)
 }
 
