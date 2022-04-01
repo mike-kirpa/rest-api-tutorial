@@ -11,7 +11,9 @@ import (
 
 	author2 "restapi-lesson/internal/author"
 	author "restapi-lesson/internal/author/db"
+	"restapi-lesson/internal/book/db"
 	"restapi-lesson/internal/config"
+	"restapi-lesson/internal/user"
 	"restapi-lesson/pkg/client/postgresql"
 	"restapi-lesson/pkg/logging"
 	"time"
@@ -33,6 +35,16 @@ func main() {
 	}
 
 	repository := author.NewRepository(postgreSQLClient, logger)
+	bookRepository := db.NewRepository(postgreSQLClient, logger)
+	all, err := bookRepository.FindAll(context.TODO())
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	for _, b := range all {
+		logger.Debug(b.Name)
+	}
+
 	/*
 		newAth := author2.Author{
 			Name: "MIR",
@@ -109,8 +121,12 @@ func main() {
 	*/
 
 	logger.Info("register author handler")
-	handler := author2.NewHandler(repository, logger)
-	handler.Register(router)
+	authorHandler := author2.NewHandler(repository, logger)
+	authorHandler.Register(router)
+
+	logger.Info("register user handler")
+	userHandler := user.NewHandler(logger)
+	userHandler.Register(router)
 
 	start(router, cfg)
 }

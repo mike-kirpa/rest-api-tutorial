@@ -2,6 +2,7 @@ package author
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"restapi-lesson/internal/author"
 	"restapi-lesson/pkg/client/postgresql"
@@ -22,16 +23,25 @@ func formatQuery(q string) string {
 
 // Create implements author.Repository
 func (r *repository) Create(ctx context.Context, author *author.Author) error {
-	q := `INSERT INTO author (name) VALUES ($1) RETURNING id`
-	r.logger.Trace(fmt.Sprintf("SQL query: %s", formatQuery(q)))
-	if err := r.client.QueryRow(ctx, q, author.Name).Scan(&author.ID); err != nil {
-		if pgerr, ok := err.(*pgconn.PgError); ok {
-			newErr := fmt.Errorf("SQL Error: %s, Detail: %s, Where: %s, Code: %s, SQLState: %s", pgerr.Message, pgerr.Detail, pgerr.Where, pgerr.Code, pgerr.SQLState())
+	q := `
+		INSERT INTO author 
+		    (name, age) 
+		VALUES 
+		       ($1, $2) 
+		RETURNING id
+	`
+	r.logger.Trace(fmt.Sprintf("SQL Query: %s", formatQuery(q)))
+	if err := r.client.QueryRow(ctx, q, author.Name, 123).Scan(&author.ID); err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			pgErr = err.(*pgconn.PgError)
+			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState()))
 			r.logger.Error(newErr)
 			return newErr
 		}
 		return err
 	}
+
 	return nil
 }
 

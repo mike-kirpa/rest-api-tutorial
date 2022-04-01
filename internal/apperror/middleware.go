@@ -9,8 +9,8 @@ type appHandler func(w http.ResponseWriter, r *http.Request) error
 
 func Middleware(h appHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var appErr *AppError
 		w.Header().Set("Content-Type", "application/json")
+		var appErr *AppError
 		err := h(w, r)
 		if err != nil {
 
